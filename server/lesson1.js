@@ -1,18 +1,37 @@
 import http from "http";
 import { customers, products, orders } from "./data.js";
+import url from "url";
 
 const application = http.createServer((request, response) => {
   const endpoint = request.url;
   const method = request.method;
+  const parsedUrl = url.parse(endpoint, true);
 
-  if (endpoint === "/orders/highvalue" && method === "GET") {
-    const highValueOrders = orders.filter(
-      (order) => order.totalPrice > 10000000
-    );
+  if (parsedUrl.pathname === "/products" && method === "GET") {
+    const { minPrice, maxPrice } = parsedUrl.query;
 
-    response.end(JSON.stringify(highValueOrders));
+    const min = minPrice ? parseInt(minPrice) : null;
+    const max = maxPrice ? parseInt(maxPrice) : null;
+
+    const filteredProducts = products.filter((product) => {
+      if (min !== null && max !== null) {
+        return product.price >= min && product.price <= max;
+      }
+
+      if (min !== null) {
+        return product.price >= min;
+      }
+
+      if (max !== null) {
+        return product.price <= max;
+      }
+
+      return true;
+    });
+
+    response.end(JSON.stringify(filteredProducts));
   } else {
-    switch (endpoint) {
+    switch (parsedUrl.pathname) {
       case "/":
         response.end("Hi");
         break;
