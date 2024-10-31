@@ -1,5 +1,5 @@
 import http from 'http'
-import customers from 'data.js'
+import { customers, products, orders } from './data.js'
 const application = http.createServer((request, response) => {
     const endpoint = request.url;
     const method = request.method;
@@ -7,7 +7,7 @@ const application = http.createServer((request, response) => {
         case '/':
             response.end (`Hi`);
             break;
-        case 'customers':
+        case '/customers':
             if (method === "GET") {
                 response.end(JSON.stringify(customers));
             }
